@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": "Harsh Gupta",
+  "description": "A modern, responsive React TypeScript application for managing and displaying property listings with advanced filtering, search capabilities, and dark mode support.",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

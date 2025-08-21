@@ -1,5 +1,7 @@
 # Property Listing Dashboard
 
+**Created by: Harsh Gupta**
+
 A modern, responsive React TypeScript application for managing and displaying property listings with advanced filtering, search capabilities, and dark mode support.
 
 ## Features
@@ -159,6 +161,10 @@ The application supports all modern browsers including:
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
+
+## Author
+
+**Harsh Gupta** - Creator and Developer
 
 ## License
 

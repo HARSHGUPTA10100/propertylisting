@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Upload, X } from 'lucide-react';
 import { PropertyType, PropertyFormData } from '../types';
 import { usePropertyContext } from '../context/PropertyContext';
 
@@ -10,8 +10,10 @@ const initialFormData: PropertyFormData = {
   name: '',
   type: 'House',
   price: 0,
+  currency: 'INR',
   location: '',
   description: '',
+  contactNumber: '',
 };
 
 export default function PropertyForm() {
@@ -19,6 +21,7 @@ export default function PropertyForm() {
   const { addProperty } = usePropertyContext();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<PropertyFormData>>({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<PropertyFormData> = {};
@@ -39,6 +42,10 @@ export default function PropertyForm() {
       newErrors.description = 'Description is required';
     }
 
+    if (!formData.contactNumber.trim()) {
+      newErrors.contactNumber = 'Contact number is required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -53,12 +60,29 @@ export default function PropertyForm() {
     }
   };
 
-  const handleInputChange = (field: keyof PropertyFormData, value: string | number) => {
+  const handleInputChange = (field: keyof PropertyFormData, value: string | number | File) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleInputChange('image', file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image: undefined }));
+    setImagePreview(null);
   };
 
   return (
@@ -143,10 +167,26 @@ export default function PropertyForm() {
           )}
         </div>
 
+        {/* Currency Selection */}
+        <div>
+          <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Currency *
+          </label>
+          <select
+            id="currency"
+            value={formData.currency}
+            onChange={(e) => handleInputChange('currency', e.target.value as 'INR' | 'USD')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+          >
+            <option value="INR">Indian Rupees (₹)</option>
+            <option value="USD">US Dollars ($)</option>
+          </select>
+        </div>
+
         {/* Price */}
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Price (₹) *
+            Price ({formData.currency === 'INR' ? '₹' : '$'}) *
           </label>
           <input
             type="number"
@@ -158,13 +198,86 @@ export default function PropertyForm() {
                 ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
                 : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
             }`}
-            placeholder="Enter property price in ₹"
+            placeholder={`Enter property price in ${formData.currency === 'INR' ? '₹' : '$'}`}
             min="0"
-            step="1000"
+            step={formData.currency === 'INR' ? '1000' : '100'}
           />
           {errors.price && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>
           )}
+        </div>
+
+        {/* Contact Number */}
+        <div>
+          <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Contact Number *
+          </label>
+          <input
+            type="tel"
+            id="contactNumber"
+            value={formData.contactNumber}
+            onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+              errors.contactNumber
+                ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+            }`}
+            placeholder="Enter contact number (e.g., +91-9876543210)"
+          />
+          {errors.contactNumber && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.contactNumber}</p>
+          )}
+        </div>
+
+        {/* Image Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Property Image
+          </label>
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+            <div className="space-y-1 text-center">
+              {imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Property preview"
+                    className="mx-auto h-32 w-32 object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                    <label
+                      htmlFor="image-upload"
+                      className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="image-upload"
+                        name="image-upload"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    PNG, JPG, GIF up to 10MB
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Description */}

@@ -142,8 +142,14 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
   const addProperty = (formData: PropertyFormData) => {
     const newProperty: Property = {
       id: Date.now().toString(),
-      ...formData,
-      image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop', // Default image
+      name: formData.name,
+      type: formData.type,
+      location: formData.location,
+      price: formData.price,
+      currency: formData.currency,
+      description: formData.description,
+      contactNumber: formData.contactNumber,
+      image: formData.image ? URL.createObjectURL(formData.image) : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop',
     };
     dispatch({ type: 'ADD_PROPERTY', payload: newProperty });
   };

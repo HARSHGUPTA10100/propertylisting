@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapPin, DollarSign, Eye, Trash2 } from 'lucide-react';
+import { MapPin, DollarSign, Eye, Trash2, Phone } from 'lucide-react';
 import { Property } from '../types';
 import { usePropertyContext } from '../context/PropertyContext';
 
@@ -10,10 +9,10 @@ interface PropertyCardProps {
 export default function PropertyCard({ property }: PropertyCardProps) {
   const { openPropertyModal, deleteProperty } = usePropertyContext();
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
+  const formatPrice = (price: number, currency: 'INR' | 'USD') => {
+    return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
@@ -46,6 +45,11 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           <span className="text-sm line-clamp-1">{property.location}</span>
         </div>
 
+        <div className="flex items-center text-gray-600 dark:text-gray-400 mb-3">
+          <Phone className="w-4 h-4 mr-1 flex-shrink-0" />
+          <span className="text-sm">{property.contactNumber}</span>
+        </div>
+
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
           {property.description}
         </p>
@@ -53,7 +57,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center text-primary-600 dark:text-primary-400">
             <DollarSign className="w-4 h-4 mr-1" />
-            <span className="font-semibold text-lg">{formatPrice(property.price)}</span>
+            <span className="font-semibold text-lg">{formatPrice(property.price, property.currency)}</span>
           </div>
 
           <div className="flex items-center space-x-2">
