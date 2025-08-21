@@ -1,4 +1,3 @@
-import React from 'react';
 import { Filter } from 'lucide-react';
 import { PropertyType } from '../types';
 import { usePropertyContext } from '../context/PropertyContext';

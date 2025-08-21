@@ -35,7 +35,7 @@ export default function PropertyForm() {
     }
 
     if (formData.price <= 0) {
-      newErrors.price = 'Price must be greater than 0';
+      newErrors.price = 'Price must be greater than 0' as any;
     }
 
     if (!formData.description.trim()) {

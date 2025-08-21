@@ -1,4 +1,3 @@
-import React from 'react';
 import { X, MapPin, DollarSign, Home, Map } from 'lucide-react';
 import { usePropertyContext } from '../context/PropertyContext';
 
